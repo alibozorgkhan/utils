@@ -49,3 +49,5 @@ class File:
         else:
             raise Exception('Bad file type')
 
+    def exists(self, path):
+        return os.path.exists(path)
