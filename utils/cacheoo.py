@@ -34,3 +34,11 @@ class Cache:
     def write(self, key, content):
         fingerprint, cache_path = self.fingerprint_path(key)
         return self.fil.write(cache_path, content, content_type='gz')
+
+    def clear(self, key):
+        fingerprint, cache_path = self.fingerprint_path(key)
+        try:
+            os.remove(cache_path)
+            return True
+        except OSError:
+            return False
