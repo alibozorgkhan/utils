@@ -3,6 +3,10 @@ utils
 
 Basic utils for daily needs
 
+##  Tests:
+
+Run `python -m unittest discover --pattern=test_*.py`.
+
 ##  Settings:
 
 Sample `utils/settings.py` file:
@@ -23,6 +27,7 @@ POSTGRES_CONFIG = {
 }
 
 #   WEBOO
+MY_IP = '1.1.1.1'
 DEFAULT_HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36',
     'Accept-Language': 'en-US,en;q=0.8,fa;q=0.6',
