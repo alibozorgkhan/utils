@@ -24,8 +24,8 @@ class DB:
         for k, v in settings.POSTGRES_CONFIG.iteritems():
             connection_config.append("%s='%s'" % (k, v))
 
-        db = psycopg2.connect(" ".join(connection_config))
-        self.cursor = Cursor(db)
+        self.db = psycopg2.connect(" ".join(connection_config))
+        self.cursor = Cursor(self.db)
 
     def read(self, query, just_one=False):
         res = None
