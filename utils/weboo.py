@@ -41,4 +41,4 @@ class Web:
         return r.content
 
     def ip(self, proxy=None, random_proxy=False):
-        return self.read('http://ip.42.pl/raw', proxy=proxy, random_proxy=random_proxy)
+        return self.read('http://ip.42.pl/raw', proxy=proxy, random_proxy=random_proxy, force_download=True)
