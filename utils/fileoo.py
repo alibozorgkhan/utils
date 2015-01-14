@@ -19,7 +19,7 @@ class File:
                 content = f.read()
             yield content
         elif content_type == 'csv':
-            with open(path, 'rb') as f:
+            with open(path, 'rU') as f:
                 reader = csv.reader(f)
                 for line in reader:
                     yield line
