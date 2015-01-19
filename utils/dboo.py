@@ -39,5 +39,8 @@ class DB:
 
     def write(self, query):
         with self.cursor as cursor:
-            cursor.execute(query)
-            self.db.commit()
+            try:
+                cursor.execute(query)
+                self.db.commit()
+            except:
+                self.db.rollback()
