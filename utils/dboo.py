@@ -1,46 +1,38 @@
 # -*- coding: utf-8 -*-
 
-import psycopg2
 import settings
-
-from psycopg2 import extras
-
-
-class Cursor:
-    def __init__(self, db):
-        self.db = db
-
-    def __enter__(self):
-        self.cursor = self.db.cursor(cursor_factory=extras.RealDictCursor)
-        return self.cursor
-
-    def __exit__(self, type, value, traceback):
-        self.cursor.close()
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 
 class DB:
     def __init__(self):
-        connection_config = []
-        for k, v in settings.POSTGRES_CONFIG.iteritems():
-            connection_config.append("%s='%s'" % (k, v))
+        engine = create_engine('postgresql://' + settings.POSTGRES_CONFIG['user'] + ':' \
+                                               + settings.POSTGRES_CONFIG['password'] + '@' \
+                                               + settings.POSTGRES_CONFIG['host'] + '/' \
+                                               + settings.POSTGRES_CONFIG['dbname'])
+        Session = sessionmaker(bind=engine)
+        self.session = Session()
 
-        self.db = psycopg2.connect(" ".join(connection_config))
-        self.cursor = Cursor(self.db)
+    def read(self, query, params={}, one=False):
+        res = self.session.execute(query, params)
+        self.session.commit()
+        return res.fetchone() if one else res.fetchall()
 
-    def read(self, query, just_one=False):
-        res = None
-        with self.cursor as cursor:
-            cursor.execute(query)
-            if just_one:
-                res = cursor.fetchone()
+    def read_in_chunks(self, query, params={}, limit=10000):
+        offset = 0
+        while True:
+            chunked_query = query + ' limit {} offset {}'.format(limit, offset)
+            res = self.read(chunked_query, params)
+            if res:
+                offset += limit
+                yield res
             else:
-                res = cursor.fetchall()
-        return res
+                break
 
-    def write(self, query):
-        with self.cursor as cursor:
-            try:
-                cursor.execute(query)
-                self.db.commit()
-            except:
-                self.db.rollback()
+    def write(self, query, params={}):
+        try:
+            self.session.execute(query, params)
+            self.session.commit()
+        except:
+            self.session.rollback()
