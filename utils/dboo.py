@@ -19,14 +19,12 @@ class DB:
         self.session.commit()
         return res.fetchone() if one else res.fetchall()
 
-    def read_in_chunks(self, query, params={}, limit=10000):
-        offset = 0
+    def read_in_chunks(self, query, params={}, chunk_size=1000):
+        res = self.session.connection().execution_options(stream_results=True).execute(query, params)
         while True:
-            chunked_query = query + ' limit {} offset {}'.format(limit, offset)
-            res = self.read(chunked_query, params)
-            if res:
-                offset += limit
-                yield res
+            rows = res.fetchmany(chunk_size)
+            if rows:
+                yield rows
             else:
                 break
 
